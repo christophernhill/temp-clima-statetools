@@ -1,4 +1,4 @@
-name = "CLIMAStateTools"
+name = "CLIMAStateCheck"
 uuid = "23213dcc-5489-4aad-bc42-99bf505c6085"
 authors = ["Climate Modeling Alliance"]
 version = "0.1.0"
