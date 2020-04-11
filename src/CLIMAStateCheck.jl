@@ -1,4 +1,4 @@
-module CLIMAStateTools
+module CLIMAStateCheck
 
 greet() = print("Hello World!")
 
