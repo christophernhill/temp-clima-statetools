@@ -5,7 +5,7 @@
 """
 module StateCheck
 
-using CLIMA.GenericCallbacks
+using CLIMA
 
 export sccreate
 
@@ -14,7 +14,10 @@ export sccreate
              Takes in a set of MPIStateArrays and creates a state checker that
              can be used in a callback().
 """
-sccreate() = print("Creating a state checker...!")
-
+sccreate() = (
+ println("Creating a state checker...!");
+ cbtest=CLIMA.GenericCallbacks.EveryXSimulationSteps(10) do (s=false); end ;
+ return cbtest;
+)
 
 end # module
