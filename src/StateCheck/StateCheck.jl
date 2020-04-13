@@ -5,7 +5,7 @@
 """
 module StateCheck
 
-using CLIMA
+import CLIMA
 
 export sccreate
 
