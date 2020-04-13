@@ -5,6 +5,8 @@
 """
 module StateCheck
 
+using CLIMA.GenericCallbacks
+
 export sccreate
 
 """
