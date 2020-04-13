@@ -5,7 +5,7 @@
 """
 module StateCheck
 
-import CLIMA
+using CLIMA.GenericCallbacks.EveryXSimulationSteps
 
 export sccreate
 
@@ -16,7 +16,7 @@ export sccreate
 """
 sccreate() = (
  println("Creating a state checker...!");
- cbtest=CLIMA.GenericCallbacks.EveryXSimulationSteps(10) do (s=false); end ;
+ cbtest=EveryXSimulationSteps(10) do (s=false); end ;
  return cbtest;
 )
 
