@@ -5,7 +5,7 @@
 """
 module StateCheck
 
-using CLIMA.GenericCallbacks.EveryXSimulationSteps
+import CLIMA.GenericCallbacks : EveryXSimulationSteps
 
 export sccreate
 
