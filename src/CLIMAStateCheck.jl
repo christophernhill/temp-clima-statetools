@@ -1,6 +1,6 @@
 """
- CLIMAStateCheck :: Moduels with a minimal set of functions for gettings statistics 
-                    and basic I/O from CLIMA DG state st=rrays, intended for regression 
+ CLIMAStateCheck :: Modules with a minimal set of functions for gettings statistics 
+                    and basic I/O from CLIMA DG state arrays, intended for regression 
                     testing and code change tracking.
 """
 module CLIMAStateCheck
@@ -10,6 +10,8 @@ export greet
 """
  A test greeting function
 """
-greet() = print("Hello World...!")
+greet() = print("Hello Hello World...!")
+
+include("StateCheck/StateCheck.jl")
 
 end # module
