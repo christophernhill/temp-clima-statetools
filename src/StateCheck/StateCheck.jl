@@ -6,16 +6,18 @@
 module StateCheck
 
 import CLIMA.GenericCallbacks: EveryXSimulationSteps
+import CLIMA.MPIStateArrays:   MPIStateArray
 
 export sccreate
 
 """
  sccreate :: Create a state checker 
-             Takes in a set of MPIStateArrays and creates a state checker that
+             Takes in a tuple of MPIStateArrays and label pairs.
+             Creates a state checker that
              can be used in a callback().
 """
-sccreate() = (
- println("Creating a state checker...!");
+sccreate(fields::Tuple{ Tuple{Any,Any,}, },ntFreq::Int=10) = (
+ println("Creating a state checker with Tuple...!");
  cbtest=EveryXSimulationSteps(10) do (s=false); end ;
  return cbtest;
 )
