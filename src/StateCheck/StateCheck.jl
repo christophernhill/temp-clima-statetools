@@ -14,10 +14,17 @@ export sccreate
 ntFreqDef=10;
 
 """
- sccreate :: Create a state checker \n
-             Takes in a tuple of MPIStateArrays and label pairs.
-             Creates a state checker that
-             can be used in a callback().
+ sccreate :: Create a "state check" call-back for one or more MPIStateArrays. \n
+              Input:
+                fields: A required first argument that is an array of one or more
+                        MPIStateArrays and label string pair tuples.
+                        State array statistics will be reported for the named symbols
+                        in each MPIStateArray labeled with the label string.
+                ntFreq: An optional second argument with default value of 
+                        $ntFreqDef that sets how freuently (in time-step counts) the
+                        statistics are reported.
+             Return: 
+                  sccb: A state checker that can be used in a callback().
 """
 sccreate(fields::Array{ Tuple{UnionAll,String},1 },ntFreq::Int=10) = (
  println("Creating a state checker with Tuple...!");
@@ -28,12 +35,8 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
  println("MPIStateArray in tuple, String"); 
 )
 sccreate(Any) = ( 
- println("# Creates state check call backs for an array of tuples, each tuple holding ");
- println("# CLIMA.MPIStateArrays.MPIStateArray and id label pairs, passed in as the   ");
- println("# first argument.");
- println("# The call back will be set to occur at a given number of timesteps in frequency.");
- println("# The default frequency of $ntFreqDef can be overridden by a second argument.");
  @doc sccreate;
 )
+sccreate()=sccreate(0)
 
 end # module
