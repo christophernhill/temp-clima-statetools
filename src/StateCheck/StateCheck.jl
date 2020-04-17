@@ -8,6 +8,9 @@
 """
 module StateCheck
 
+using Statistics
+using Printf
+
 import CLIMA.GenericCallbacks:  EveryXSimulationSteps
 import CLIMA.MPIStateArrays:    MPIStateArray
 import CLIMA.VariableTemplates: flattenednames
@@ -42,7 +45,7 @@ ntFreqDef=10;
              Example:
              julia> F1=@vars begin; ν∇u::SMatrix{3, 2, T, 6}; κ∇θ::SVector{3, T}; end
              julia> F2=@vars begin; u::SVector{2, T}; θ::SVector{1, T}; end
-             julia> Q1=MPIStateArray{Float32,F1}(MPI.COMM_WORLD,CLIMA.array_type(),4,6,8);
+             julia> Q1=MPIStateArray{Float32,F1}(MPI.COMM_WORLD,CLIMA.array_type(),4,9,8);
              julia> Q2=MPIStateArray{Float64,F2}(MPI.COMM_WORLD,CLIMA.array_type(),4,6,8);
              julia> cb=StateCheck.sccreate([(Q1,"My gradients"),(Q2,"My fields")],1);
              julia> cb()
@@ -86,6 +89,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
   # Track which timestep this is
   nCbCalls=nCbCalls+1;
   nStep=(nCbCalls-1)*ntFreq+1;
+  nSStr=@sprintf("%7.7d",nStep)
 
   ## Print header
   println("# SC +++++++++++CLIMA StateCheck call-back start+++++++++++++++++")
@@ -96,6 +100,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
   for f in fields
 
    olabel=f[2];
+   olStr=@sprintf("%12.12s",olabel)
    mArray=f[1];
 
    # Get descriptor for MPIStateArray
@@ -108,7 +113,10 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
    for i in 1:length(V.names)
     for n in flattenednames(fieldtype(V,i),prefix=fieldname(V,i))
      ivar=ivar+1
-     println("# SC step ",nStep,": ",olabel," ", n, " ", ivar)
+     nStr=@sprintf("%9.9s",n)
+     print("# SC ",nSStr," ",olStr," ", nStr, " ")
+     statsString=scstats(mArray,ivar)
+     println(statsString)
     end
    end
   end
@@ -126,5 +134,13 @@ sccreate(Any...) = (
  @doc sccreate;
 )
 sccreate()=sccreate(0)
+
+function scstats(V,ivar)
+  phi=minimum(V.data[:,ivar,:])
+  minVstr=@sprintf("%24.16e",phi)
+  phi=maximum(V.data[:,ivar,:])
+  maxVstr=@sprintf("%24.16e",phi)
+  return minVstr, maxVstr
+end
 
 end # module
