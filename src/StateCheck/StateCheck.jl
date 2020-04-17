@@ -93,8 +93,8 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
 
   ## Print header
   println("# SC +++++++++++CLIMA StateCheck call-back start+++++++++++++++++")
-  println("# SC  Step      Label       Field                          Stats                       ")
-  println("# SC ======= ============ ========= |== min() ===|=== max() ===|   mean()    std()     ")
+  println("# SC  Step  |   Label    |  Field   |                                       Stats                       ")
+  println("# SC =======|============|==========|======== min() ========|======== max() ========|======== mean() ========|std()     ")
 
   ## Iterate over the set of MPIStateArrays for this callback
   for f in fields
@@ -116,7 +116,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
      nStr=@sprintf("%9.9s",n)
      print("# SC ",nSStr," ",olStr," ", nStr, " ")
      statsString=scstats(mArray,ivar)
-     println(statsString)
+     println(statsString[1],statsString[2])
     end
    end
   end
