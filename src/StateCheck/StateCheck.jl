@@ -8,10 +8,12 @@
 """
 module StateCheck
 
+# Imports from standard Julia packages
 using MPI
 using Printf
 using Statistics
 
+# Imports from CLIMA core
 import CLIMA.GenericCallbacks:  EveryXSimulationSteps
 import CLIMA.MPIStateArrays:    MPIStateArray
 import CLIMA.VariableTemplates: flattenednames
@@ -25,14 +27,18 @@ Pkg.add("StaticArrays");using StaticArrays
 flattenednames(::Type{T}; prefix="") where {T<:SArray} = ntuple(i -> "$prefix[$i]", length(T))
 ####
 
+# Global functions to expose
+# sccreate - Create a state checker call back
 export sccreate
 
 # ntFreqDef:: default frequency (in time steps) for output.
 ntFreqDef=10;
 
 """
- sccreate :: Create a "state check" call-back for one or more MPIStateArrays. \n
-              Input:
+ sccreate :: Create a "state check" call-back for one or more MPIStateArrays  \n
+             that will report basic statistics for the fields in the array.
+
+             Input:
                 fields: A required first argument that is an array of one or more
                         MPIStateArrays and label string pair tuples.
                         State array statistics will be reported for the named symbols
@@ -40,8 +46,9 @@ ntFreqDef=10;
                 ntFreq: An optional second argument with default value of 
                         $ntFreqDef that sets how freuently (in time-step counts) the
                         statistics are reported.
+
              Return: 
-                  sccb: A state checker that can be used in a callback().
+                sccb: A state checker that can be used in a callback().
 
              Example:
              julia> F1=@vars begin; ν∇u::SMatrix{3, 2, T, 6}; κ∇θ::SVector{3, T}; end
@@ -117,7 +124,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
      nStr=@sprintf("%9.9s",n)
      print("# SC ",nSStr," ",olStr," ", nStr, " ")
      statsString=scstats(mArray,ivar)
-     println(statsString[1],statsString[2],statsString[3],statsString[4])
+     println(statsString[1],"|",statsString[2],statsString[3],statsString[4])
     end
    end
   end
