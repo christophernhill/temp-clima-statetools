@@ -148,21 +148,25 @@ function scstats(V,ivar)
 
   # Max
   phiLoc=maximum(V.data[:,ivar,:])
-  phi=phiLoc
+  phiMax=MPI.Reduce(phiLoc,MPI.MAX,0,V.mpicomm)
+  phi=phiMax
   maxVstr=@sprintf("%24.16e",phi)
 
   # Ave
   phiLoc=mean(V.data[:,ivar,:])
-  phi=phiLoc
-  phiMean=phi
+  phiSum=MPI.Reduce(phiLoc,+,0,V.mpicomm)
+  phiMean=phiSum/(nproc*1.)
+  phi=phiMean
   aveVstr=@sprintf("%24.16e",phi)
 
   # Std
   phiLoc=(V.data[:,ivar,:].-phiMean).^2
   nVal=length(phiLoc)*1.
-  phiStd=(sum(phiLoc)/(nVal-1))^0.5
-  phi=phiLoc
-  stdVstr=@sprintf("%24.16e",phiStd)
+  phiSum=MPI.Reduce(phiLoc,+,0,V.mpicomm)
+  nValSum=MPI.Reduce(nVal,+,0,V.mpicomm)
+  phiStd=(sum(phiSum)/(nValSum-1))^0.5
+  phi=phiStd
+  stdVstr=@sprintf("%24.16e",phi)
 
   return minVstr, maxVstr, aveVstr, stdVstr
 end
