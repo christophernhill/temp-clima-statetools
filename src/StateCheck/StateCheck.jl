@@ -8,8 +8,9 @@
 """
 module StateCheck
 
-using Statistics
+using MPI
 using Printf
+using Statistics
 
 import CLIMA.GenericCallbacks:  EveryXSimulationSteps
 import CLIMA.MPIStateArrays:    MPIStateArray
@@ -94,7 +95,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
   ## Print header
   println("# SC +++++++++++CLIMA StateCheck call-back start+++++++++++++++++")
   println("# SC  Step  |   Label    |  Field   |                                       Stats                       ")
-  println("# SC =======|============|==========|======== min() ========|======== max() ========|======== mean() ========|std()     ")
+  println("# SC =======|============|==========|======== min() ========|======== max() ========|======== mean() =======|======== std() ========|")
 
   ## Iterate over the set of MPIStateArrays for this callback
   for f in fields
@@ -116,7 +117,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
      nStr=@sprintf("%9.9s",n)
      print("# SC ",nSStr," ",olStr," ", nStr, " ")
      statsString=scstats(mArray,ivar)
-     println(statsString[1],statsString[2])
+     println(statsString[1],statsString[2],statsString[3],statsString[4])
     end
    end
   end
@@ -136,11 +137,34 @@ sccreate(Any...) = (
 sccreate()=sccreate(0)
 
 function scstats(V,ivar)
-  phi=minimum(V.data[:,ivar,:])
+  # Get number of MPI procs
+  nproc = MPI.Comm_size(V.mpicomm)
+
+  # Min
+  phiLoc=minimum(V.data[:,ivar,:])
+  phiMin=MPI.Reduce(phiLoc,MPI.MIN,0,V.mpicomm)
+  phi=phiMin
   minVstr=@sprintf("%24.16e",phi)
-  phi=maximum(V.data[:,ivar,:])
+
+  # Max
+  phiLoc=maximum(V.data[:,ivar,:])
+  phi=phiLoc
   maxVstr=@sprintf("%24.16e",phi)
-  return minVstr, maxVstr
+
+  # Ave
+  phiLoc=mean(V.data[:,ivar,:])
+  phi=phiLoc
+  phiMean=phi
+  aveVstr=@sprintf("%24.16e",phi)
+
+  # Std
+  phiLoc=(V.data[:,ivar,:].-phiMean).^2
+  nVal=length(phiLoc)*1.
+  phiStd=(sum(phiLoc)/(nVal-1))^0.5
+  phi=phiLoc
+  stdVstr=@sprintf("%24.16e",phiStd)
+
+  return minVstr, maxVstr, aveVstr, stdVstr
 end
 
 end # module
