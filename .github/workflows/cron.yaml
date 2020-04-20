@@ -8,4 +8,6 @@
 # julia> using Pkg
 # julia> ps=PackageSpec(url="https://github.com/jm-c/CLIMA.git",rev="jmc/split_explicit_dvlp")
 # julia> Pkg.add(ps)
+# julia> Pkg.add("StaticArrays")
+# julia> Pkg.add("GPUifyLoops")
 #
