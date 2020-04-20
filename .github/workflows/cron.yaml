@@ -6,5 +6,5 @@
 # 
 # julia> using Pkg
 # julia> ps=PackageSpec(url="https://github.com/jm-c/CLIMA.git")
-# Pkg.add(ps)
+# julia> Pkg.add(ps)
 #
