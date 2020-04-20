@@ -1,13 +1,17 @@
 #
 # docker run --rm -d jupyter/datascience-notebook  
+#
 # docker exec -i -t -u 0 thirsty_williamson /bin/bash
 # apt-get update
 # apt-get install openmpi-'*' libopenmpi-'*'
 # apt-get install ssh
 # 
+# docker exec -i -t thirsty_williamson /bin/bash
+# git clone https://github.com/christophernhill/temp-clima-statetools.git  # SHOULD BE THIS REPO
 # julia> using Pkg
 # julia> ps=PackageSpec(url="https://github.com/jm-c/CLIMA.git",rev="jmc/split_explicit_dvlp")
 # julia> Pkg.add(ps)
 # julia> Pkg.add("StaticArrays")
 # julia> Pkg.add("GPUifyLoops")
+# julia> include("temp-clima-statetools/example/Ocean/SplitExplicit/simple_box_sRate_cnh.jl")
 #
