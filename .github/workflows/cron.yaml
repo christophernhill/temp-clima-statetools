@@ -3,6 +3,7 @@
 # docker exec -i -t -u 0 thirsty_williamson /bin/bash
 # apt-get update
 # apt-get install openmpi-'*' libopenmpi-'*'
+# apt-get install ssh
 # 
 # julia> using Pkg
 # julia> ps=PackageSpec(url="https://github.com/jm-c/CLIMA.git")
