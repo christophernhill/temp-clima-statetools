@@ -16,8 +16,12 @@
 # julia> include("temp-clima-statetools/example/Ocean/SplitExplicit/simple_box_sRate_cnh.jl")
 #
 
-name: 'Hello World'
+name: a test
+on: [push]
 
-runs: 
- using: 'docker'
- image: 'example.Dockerfile'
+jobs:
+ build:
+  name: 'Hello World'
+  runs: 
+   using: 'docker'
+   image: 'example.Dockerfile'
