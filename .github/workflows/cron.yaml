@@ -15,3 +15,9 @@
 # julia> Pkg.add("GPUifyLoops")
 # julia> include("temp-clima-statetools/example/Ocean/SplitExplicit/simple_box_sRate_cnh.jl")
 #
+
+name: 'Hello World'
+
+runs: 
+ using: 'docker'
+ image: 'example.Dockerfile'
