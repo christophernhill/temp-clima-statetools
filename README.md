@@ -1,6 +1,22 @@
 # temp-clima-statechecks
 Temporary place to store state check code for simple regression testing
 
+# Example usage
+
+  - see example/Ocean/SplitExplicit/simple_box_sRate_cnh.jl
+    1. add this package
+    ```
+       :
+       :
+    ## Add State statistics package
+    Pkg.add(
+     PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.1")
+    )
+    using CLIMAStateCheck
+       :
+       :
+    ```
+
 # Some possibly useful ~/startup.jl functions
  (1) Set where CLIMA packages come from - sometimes its nice to take from local clones
      sometimes taking from git is preferred.
