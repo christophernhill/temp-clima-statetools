@@ -17,6 +17,28 @@ Temporary place to store state check code for simple regression testing
        :
     ```
 
+    2. create call back referencing the MPIStateArrays to be tracked every ```ntFreq```
+       timesteps
+    ```
+       :
+       :
+       ntFreq=1
+       cbcs_dg=CLIMAStateCheck.StateCheck.sccreate(
+            [(Q_3D,"dg Q_3D"),
+             (dg.auxstate,"dg auxstate"),
+             (dg.modeldata.tendency_dg.auxstate,"dg tdg.aux"),
+             (dg.modeldata.conti3d_Q,"dg conti3d_Q"),
+             (Q_2D,"baro Q_2D"),
+             (barotropic_dg.auxstate ,"baro auxstate"),
+             (barotropic_dg.diffstate,"baro diffstate"),
+             (horizontal_dg.auxstate, "horz auxstate"),
+             (horizontal_dg.diffstate,"horz diffstate")
+            ],
+            ntFreq);
+       :
+       :
+    ```
+
 # Some possibly useful ~/startup.jl functions
  (1) Set where CLIMA packages come from - sometimes its nice to take from local clones
      sometimes taking from git is preferred.
