@@ -18,7 +18,7 @@ Temporary place to store state check code for simple regression testing
     ```
 
     2. create call back referencing the MPIStateArrays to be tracked every ```ntFreq```
-       timesteps
+       timesteps. Include a string for labeling each state array statistics.
     ```
        :
        :
