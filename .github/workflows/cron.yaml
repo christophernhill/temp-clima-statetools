@@ -20,9 +20,10 @@ name: a test
 on: [push]
 
 jobs:
- steps:
-  build:
-   name: 'Hello World'
-   runs: 
-    using: 'docker'
-    image: 'example.Dockerfile'
+ build:
+  runs-on: ubuntu-latest
+  steps:
+   - name: 'Hello World'
+   - runs: 
+      using: 'docker'
+      image: 'example.Dockerfile'
