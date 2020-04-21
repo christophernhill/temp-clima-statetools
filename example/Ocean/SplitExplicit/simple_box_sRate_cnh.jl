@@ -33,7 +33,7 @@ using GPUifyLoops
 
 ## Add State statistics package
 Pkg.add(
- PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.1")
+ PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.2")
 )
 using CLIMAStateCheck
 
