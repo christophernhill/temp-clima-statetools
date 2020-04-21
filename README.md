@@ -39,6 +39,16 @@ Temporary place to store state check code for simple regression testing
        :
     ```
 
+    3. add call back to set passed to ODE solver.
+    ```
+      :
+      :
+    cbv=(cbvector...,cbcs_dg)
+    solve!(Qvec, odesolver; timeend = timeend, callbacks = cbv)
+      :
+      :
+    ```
+
 # Some possibly useful ~/startup.jl functions
  (1) Set where CLIMA packages come from - sometimes its nice to take from local clones
      sometimes taking from git is preferred.
