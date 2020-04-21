@@ -119,6 +119,7 @@ Temporary place to store state check code for simple regression testing
 julia> using Pkg
 julia> Pkg.add( PackageSpec(url="https://github.com/jm-c/CLIMA.git",rev="jmc/split_explicit_dvlp") )
 julia> using CLIMA
+julia> Pkg.add("MPI"); Pkg.add("StaticArrays"); Pkg.add("GPUifyLoops");
 julia> include("example/Ocean/SplitExplicit/simple_box_sRate_cnh.jl")
 ```
 
