@@ -108,6 +108,18 @@ Temporary place to store state check code for simple regression testing
   # SC 0000004|horz diffsta|    κ∇θ[3 | -1.8814254023814132e-15|  2.1978358858122240e-15|  3.4921212458811655e-21|  1.6336952019543006e-17|
   # SC +++++++++++CLIMA StateCheck call-back end+++++++++++++++++++
   ```
+  
+# Try it in the REPL
+
+```
+% mkdir foo
+% cd foo
+% git clone https://github.com/christophernhill/temp-clima-statetools
+% cd temp-clima-statetools
+julia> using Pkg
+julia> Pkg.add( PackageSpec(url="https://github.com/jm-c/CLIMA.git",rev="jmc/split_explicit_dvlp") )
+julia> include(example/Ocean/SplitExplicit/simple_box_sRate_cnh.jl")
+```
 
 # Some possibly useful ~/startup.jl functions
  (1) Set where CLIMA packages come from - sometimes its nice to take from local clones
