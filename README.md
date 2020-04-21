@@ -2,8 +2,8 @@
 Temporary place to store state check code for simple regression testing
 
 # Some possibly useful ~/startup.jl functions
-## (1) Set where CLIMA packages come from - sometimes its nice to take from local clones
-##     sometimes taking from git is preferred.
+ (1) Set where CLIMA packages come from - sometimes its nice to take from local clones
+     sometimes taking from git is preferred.
 
 ```
 using Pkg
