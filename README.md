@@ -22,8 +22,8 @@ Temporary place to store state check code for simple regression testing
     ```
        :
        :
-       ntFreq=1
-       cbcs_dg=CLIMAStateCheck.StateCheck.sccreate(
+     ntFreq=1
+     cbcs_dg=CLIMAStateCheck.StateCheck.sccreate(
             [(Q_3D,"dg Q_3D"),
              (dg.auxstate,"dg auxstate"),
              (dg.modeldata.tendency_dg.auxstate,"dg tdg.aux"),
