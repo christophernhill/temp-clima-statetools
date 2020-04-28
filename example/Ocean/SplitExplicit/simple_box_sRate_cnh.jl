@@ -33,7 +33,7 @@ using GPUifyLoops
 
 ## Add State statistics package
 Pkg.add(
- PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.2")
+ PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.3")
 )
 using CLIMAStateCheck
 
@@ -243,7 +243,7 @@ function main()
              (horizontal_dg.auxstate, "horz auxstate"),
              (horizontal_dg.diffstate,"horz diffstate")
             ],
-            ntFreq);
+            ntFreq; prec=15);
 
     lsrk_ocean = LSRK144NiegemannDiehlBusch(dg, Q_3D, dt = dt_slow, t0 = 0)
     lsrk_horizontal =
