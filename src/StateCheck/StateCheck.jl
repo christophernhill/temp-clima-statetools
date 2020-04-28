@@ -102,7 +102,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
   # Track which timestep this is
   nCbCalls=nCbCalls+1;
   nStep=(nCbCalls-1)*ntFreq+1;
-  nSStr=@sprintf("%7.7d",nStep)
+  nSStr=@sprintf("%7.7d",nStep-1)
 
   ## Print header
   nprec=min(max(1,prec),20)
