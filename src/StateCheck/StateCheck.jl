@@ -12,6 +12,7 @@ module StateCheck
 using MPI
 using Printf
 using Statistics
+using Formatting
 
 # Imports from CLIMA core
 import CLIMA.GenericCallbacks:  EveryXSimulationSteps
@@ -33,9 +34,10 @@ export sccreate
 
 # ntFreqDef:: default frequency (in time steps) for output.
 ntFreqDef=10;
+precDef=15;
 
 """
- sccreate :: Create a "state check" call-back for one or more MPIStateArrays  \n
+ sccreate :: Create a a "state check" call-back for one or more MPIStateArrays  \n
              that will report basic statistics for the fields in the array.
 
              Input:
@@ -46,6 +48,9 @@ ntFreqDef=10;
                 ntFreq: An optional second argument with default value of 
                         $ntFreqDef that sets how freuently (in time-step counts) the
                         statistics are reported.
+             Named:
+                  prec: A named argument that sets number of decimal places to print for
+                        statistics, defaults to $precDef.
 
              Return: 
                 sccb: A state checker that can be used in a callback().
@@ -55,11 +60,11 @@ ntFreqDef=10;
              julia> F2=@vars begin; u::SVector{2, T}; θ::SVector{1, T}; end
              julia> Q1=MPIStateArray{Float32,F1}(MPI.COMM_WORLD,CLIMA.array_type(),4,9,8);
              julia> Q2=MPIStateArray{Float64,F2}(MPI.COMM_WORLD,CLIMA.array_type(),4,6,8);
-             julia> cb=StateCheck.sccreate([(Q1,"My gradients"),(Q2,"My fields")],1);
+             julia> cb=StateCheck.sccreate([(Q1,"My gradients"),(Q2,"My fields")],1; prec=$precDef);
              julia> cb()
  ========================================================================================
 """
-sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef) = ( 
+sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef; prec=precDef) = ( 
 
  println("# Start: creating state check callback"); 
 
@@ -100,9 +105,15 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
   nSStr=@sprintf("%7.7d",nStep)
 
   ## Print header
+  nprec=min(max(1,prec),20)
   println("# SC +++++++++++CLIMA StateCheck call-back start+++++++++++++++++")
-  println("# SC  Step  |   Label    |  Field   |                                       Stats                       ")
-  println("# SC =======|============|==========|======== min() =========|======== max() =========|======== mean() ========|======== std() =========|")
+  println("# SC  Step  |   Label    |  Field   |                            Stats                       ")
+  hVarFmt="%" * sprintf1("%d",nprec+8) * "s"
+  minStr=sprintf1(hVarFmt," min() ")
+  maxStr=sprintf1(hVarFmt," max() ")
+  aveStr=sprintf1(hVarFmt," mean() ")
+  stdStr=sprintf1(hVarFmt," std() ")
+  println("# SC =======|============|==========|",minStr,"|",maxStr,"|",aveStr,"|",stdStr,"|")
 
   ## Iterate over the set of MPIStateArrays for this callback
   for f in fields
@@ -123,7 +134,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
      ivar=ivar+1
      nStr=@sprintf("%9.9s",n)
      print("# SC ",nSStr,"|",olStr,"|", nStr, " |")
-     statsString=scstats(mArray,ivar)
+     statsString=scstats(mArray,ivar,nprec)
      println(statsString[1],"|",statsString[2],"|",statsString[3],"|",statsString[4],"|")
     end
    end
@@ -143,28 +154,34 @@ sccreate(Any...) = (
 )
 sccreate()=sccreate(0)
 
-function scstats(V,ivar)
+function scstats(V,ivar,nprec)
   # Get number of MPI procs
   nproc = MPI.Comm_size(V.mpicomm)
+
+  npr=nprec;fmt=@sprintf("%%%d.%de",npr+8,npr)
 
   # Min
   phiLoc=minimum(V.data[:,ivar,:])
   phiMin=MPI.Reduce(phiLoc,MPI.MIN,0,V.mpicomm)
   phi=phiMin
-  minVstr=@sprintf("%24.16e",phi)
+  # minVstr=@sprintf("%23.15e",phi)
+  minVstr=sprintf1(fmt,phi)
+  
 
   # Max
   phiLoc=maximum(V.data[:,ivar,:])
   phiMax=MPI.Reduce(phiLoc,MPI.MAX,0,V.mpicomm)
   phi=phiMax
-  maxVstr=@sprintf("%24.16e",phi)
+  # maxVstr=@sprintf("%23.15e",phi)
+  maxVstr=sprintf1(fmt,phi)
 
   # Ave
   phiLoc=mean(V.data[:,ivar,:])
   phiSum=MPI.Reduce(phiLoc,+,0,V.mpicomm)
   phiMean=phiSum/(nproc*1.)
   phi=phiMean
-  aveVstr=@sprintf("%24.16e",phi)
+  # aveVstr=@sprintf("%23.15e",phi)
+  aveVstr=sprintf1(fmt,phi)
 
   # Std
   phiLoc=(V.data[:,ivar,:].-phiMean).^2
@@ -173,7 +190,8 @@ function scstats(V,ivar)
   nValSum=MPI.Reduce(nVal,+,0,V.mpicomm)
   phiStd=(sum(phiSum)/(nValSum-1))^0.5
   phi=phiStd
-  stdVstr=@sprintf("%24.16e",phi)
+  # stdVstr=@sprintf("%23.15e",phi)
+  stdVstr=sprintf1(fmt,phi)
 
   return minVstr, maxVstr, aveVstr, stdVstr
 end
