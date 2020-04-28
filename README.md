@@ -10,7 +10,7 @@ Temporary place to store state check code for simple regression testing
        :
     ## Add State statistics package
     Pkg.add(
-     PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.2")
+     PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.3")
     )
     using CLIMAStateCheck
        :
