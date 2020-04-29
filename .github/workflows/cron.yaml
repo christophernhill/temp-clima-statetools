@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
      - name: Setup env
-       run: apt-get -y install openmpi-'*'; apt-get -y install ssh ; apt-get -y install curl 
+       run: sudo apt-get -y install openmpi-'*' ssh curl 
      - name: A simple test to understand
        run: pwd
      - name: Show run directory
