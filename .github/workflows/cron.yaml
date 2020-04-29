@@ -20,10 +20,12 @@ name: a test
 on: [push]
 
 jobs:
- build:
-  runs-on: ubuntu-latest
-  steps:
-   - name: 'Hello World'
-   - runs: 
-      using: 'docker'
-      image: 'example.Dockerfile'
+  build:
+    runs-on: ubuntu-latest
+    steps:
+     - name: Setup env
+       run: apt-get -y install openmpi-'*'; apt-get -y install ssh ; apt-get -y install curl 
+     - name: A simple test to understand
+       run: pwd
+     - name: Show run directory
+       run: /bin/ls -altr
