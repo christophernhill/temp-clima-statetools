@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
      - name: Setup base env
-       run: sudo apt-get -y install openmpi-'*' ssh curl 
+       run: sudo apt-get -y install openmpi-'*' ssh curl libopenmpi-'*'
      - name: Get julia
        run: |
             cd /opt
