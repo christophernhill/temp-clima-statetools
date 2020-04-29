@@ -12,11 +12,6 @@ using CLIMAParameters.Planet: grav
 struct EarthParameterSet <: AbstractEarthParameterSet end
 const param_set = EarthParameterSet()
 
-Pkg.add(
-        PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.3")
-       )
-using CLIMAStateCheck
-
 function config_simple_box(FT, N, resolution, dimensions; BC = nothing)
     if BC == nothing
         problem = OceanGyre{FT}(dimensions...)
@@ -82,7 +77,7 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60)
         Courant_number = Courant_number,
     )
 
-    ntFreq=10
+    ntFreq=30
     cb=CLIMAStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),(solver_config.dg.auxstate,"aux",), (solver_config.dg.diffstate,"diff",) ],
        ntFreq; prec=12 )
 
