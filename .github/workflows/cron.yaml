@@ -39,6 +39,6 @@ jobs:
              Pkg.add( PackageSpec(url="https://github.com/climate-machine/CLIMA",rev="fb2a63456f32c2d40d194cbdbdbf9afe285ac77d")      );
              Pkg.add( PackageSpec(url="https://github.com/climate-machine/CLIMAParameters.jl")      );
              Pkg.add( PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools")  );
-             using CLIMAStateCheckusing CLIMAStateCheck
+             using CLIMAStateCheck
              exit();
              !
