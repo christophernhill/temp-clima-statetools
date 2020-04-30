@@ -49,7 +49,7 @@ jobs:
              git clone https://github.com/climate-machine/CLIMA
              ls -altr
              cd CLIMA
-             git checkout fb2a63456f32c2d40d194cbdbdbf9afe285ac77d
+             # git checkout fb2a63456f32c2d40d194cbdbdbf9afe285ac77d
              /opt/julia-1.4.1/bin/julia <<!
              using Pkg
              Pkg.activate(".")
