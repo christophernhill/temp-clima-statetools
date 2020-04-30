@@ -150,7 +150,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
      statsVal[n]=statsString[5];
     end
    end
-   curStats[olStr]=statsVal;
+   curStats[olabel]=statsVal;
   end
   println("# SC +++++++++++CLIMA StateCheck call-back end+++++++++++++++++++")
  end ;
