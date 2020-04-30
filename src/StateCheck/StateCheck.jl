@@ -28,6 +28,8 @@ Pkg.add("StaticArrays");using StaticArrays
 flattenednames(::Type{T}; prefix="") where {T<:SArray} = ntuple(i -> "$prefix[$i]", length(T))
 ####
 
+struct vstat ; max; min; mean; std ; end
+
 # Global functions to expose
 # sccreate - Create a state checker call back
 export sccreate
@@ -56,6 +58,9 @@ precDef=15;
                 sccb: A state checker that can be used in a callback().
 
              Example:
+             julia> using CLIMA.VariableTemplates
+             julia> using StaticArrays
+             julia> T=Float64
              julia> F1=@vars begin; ν∇u::SMatrix{3, 2, T, 6}; κ∇θ::SVector{3, T}; end
              julia> F2=@vars begin; u::SVector{2, T}; θ::SVector{1, T}; end
              julia> Q1=MPIStateArray{Float32,F1}(MPI.COMM_WORLD,CLIMA.array_type(),4,9,8);
@@ -95,6 +100,11 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
  ###
  nCbCalls=0;
 
+ ###
+ # Create holder for most recent stats
+ ###
+ curStats=Dict();
+
  ######
  # Create the callback
  ######
@@ -129,6 +139,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
    ## Iterate over fields in each MPIStateArray
    #  (use ivar to index individual arrays within the MPIStateArray)
    ivar=0
+   statsVal=Dict()
    for i in 1:length(V.names)
     for n in flattenednames(fieldtype(V,i),prefix=fieldname(V,i))
      ivar=ivar+1
@@ -136,8 +147,10 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
      print("# SC ",nSStr,"|",olStr,"|", nStr, " |")
      statsString=scstats(mArray,ivar,nprec)
      println(statsString[1],"|",statsString[2],"|",statsString[3],"|",statsString[4],"|")
+     statsVal[n]=statsString[5];
     end
    end
+   curStats[olStr]=statsVal;
   end
   println("# SC +++++++++++CLIMA StateCheck call-back end+++++++++++++++++++")
  end ;
@@ -155,6 +168,7 @@ sccreate(Any...) = (
 sccreate()=sccreate(0)
 
 function scstats(V,ivar,nprec)
+
   # Get number of MPI procs
   nproc = MPI.Comm_size(V.mpicomm)
 
@@ -166,7 +180,6 @@ function scstats(V,ivar,nprec)
   phi=phiMin
   # minVstr=@sprintf("%23.15e",phi)
   minVstr=sprintf1(fmt,phi)
-  
 
   # Max
   phiLoc=maximum(V.data[:,ivar,:])
@@ -193,7 +206,9 @@ function scstats(V,ivar,nprec)
   # stdVstr=@sprintf("%23.15e",phi)
   stdVstr=sprintf1(fmt,phi)
 
-  return minVstr, maxVstr, aveVstr, stdVstr
+  vals=vstat(phiMin,phiMax,phiMean,phiStd)
+
+  return minVstr, maxVstr, aveVstr, stdVstr, vals
 end
 
 end # module
