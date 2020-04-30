@@ -78,8 +78,11 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60)
     )
 
     ntFreq=30
-    cb=CLIMAStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),(solver_config.dg.auxstate,"aux",), (solver_config.dg.diffstate,"diff",) ],
-       ntFreq; prec=12 )
+    # cb=CLIMAStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),(solver_config.dg.auxstate,"aux",), (solver_config.dg.diffstate,"diff",) ], ntFreq; prec=12 )
+    cb=CLIMAStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),
+                                              (solver_config.dg.state_auxiliary,"s_aux",), 
+                                              (solver_config.dg.state_gradient_flux,"s_gflux",) ], 
+                                            ntFreq; prec=12 )
 
     result = CLIMA.invoke!(solver_config; user_callbacks=[cb] )
 
