@@ -103,7 +103,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
  ###
  # Create holder for most recent stats
  ###
- curStats=Dict();
+ curStats_dict=Dict();
 
  ######
  # Create the callback
@@ -139,7 +139,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
    ## Iterate over fields in each MPIStateArray
    #  (use ivar to index individual arrays within the MPIStateArray)
    ivar=0
-   statsVal=Dict()
+   statsVal_dict=Dict()
    for i in 1:length(V.names)
     for n in flattenednames(fieldtype(V,i),prefix=fieldname(V,i))
      ivar=ivar+1
@@ -147,10 +147,10 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
      print("# SC ",nSStr,"|",olStr,"|", nStr, " |")
      statsString=scstats(mArray,ivar,nprec)
      println(statsString[1],"|",statsString[2],"|",statsString[3],"|",statsString[4],"|")
-     statsVal[n]=statsString[5];
+     statsVal_dict[n]=statsString[5];
     end
    end
-   curStats[olabel]=statsVal;
+   curStats_dict[olabel]=statsVal_dict;
   end
   println("# SC +++++++++++CLIMA StateCheck call-back end+++++++++++++++++++")
  end ;
