@@ -104,6 +104,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
  # Create holder for most recent stats
  ###
  curStats_dict=Dict();
+ curStats_flat=[];
 
  ######
  # Create the callback
@@ -148,6 +149,9 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
      statsString=scstats(mArray,ivar,nprec)
      println(statsString[1],"|",statsString[2],"|",statsString[3],"|",statsString[4],"|")
      statsVal_dict[n]=statsString[5];
+     append!(curStats_flat, [ 
+      [olabel,n,statsString[5].max,statsString[5].min,statsString[5].mean,statsString[5].std] 
+     ] )
     end
    end
    curStats_dict[olabel]=statsVal_dict;
