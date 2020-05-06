@@ -33,6 +33,7 @@ struct vstat ; max; min; mean; std ; end
 # Global functions to expose
 # sccreate - Create a state checker call back
 export sccreate
+export scdocheck
 export scprint
 
 # ntFreqDef:: default frequency (in time steps) for output.
@@ -311,6 +312,18 @@ function scprintref( cb )
  end
  println("]")
  println("# END SCPRINT")
+end
+
+"""
+"""
+function scdocheck( cb, refDat )
+
+  irow=1
+  for row in cb.func.curStats_flat
+   println(row)
+   println(refDat[1][irow])
+   irow=irow+1
+  end
 end
 
 end # module
