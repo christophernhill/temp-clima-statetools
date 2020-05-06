@@ -225,7 +225,7 @@ function scprint( cb )
  f=1;
  a1l=maximum( length.(map(i->(phi[i])[f],range(1,length=length(phi)) )) )
  f=2;
- a2l=maximum( length.(map(i->(phi[i])[f],range(1,length=length(phi)) )) )
+ a2l=maximum( length.(String.((map(i->(phi[i])[f],range(1,length=length(phi)) )) ) ) )
  fmt1=@sprintf("%%%d.%ds",a1l,a1l)
  fmt2=@sprintf("%%%d.%ds",a2l,a2l)
  fmt3=@sprintf("%%28.20e")
@@ -267,12 +267,19 @@ function scprint( cb )
   s1=lv[1]
   l1=length(s1); s1=sp[1:a1l-l1] * "\"" * s1 * "\"";
   s2=lv[2]
-  l2=length(s2); s2=sp[1:a2l-l2] * "\"" * s2 * "\"";
+  if typeof(s2) == String
+    l2=length(s2); s2=sp[1:a2l-l2] * "\"" * s2 * "\"";
+    s22="";
+  end
+  if typeof(s2) == Symbol
+    s22=s2;
+    l2=length(String(s2)); s2=sp[1:a2l-l2+1] * ":";
+  end
   s3=sprintf1(fmt3,lv[3])
   s4=sprintf1(fmt3,lv[4])
   s5=sprintf1(fmt3,lv[5])
   s6=sprintf1(fmt3,lv[6])
-  println( " [ ", s1,", ", s2,"," ,"    16,    16,    16,    16 ]," )
+  println( " [ ", s1,", ", s2,s22,"," ,"    16,    16,    16,    16 ]," )
  end
  println("]")
  println("# END SCPRINT")
