@@ -9,10 +9,10 @@
 module StateCheck
 
 # Imports from standard Julia packages
+using Formatting
 using MPI
 using Printf
 using Statistics
-using Formatting
 
 # Imports from CLIMA core
 import CLIMA.GenericCallbacks:  EveryXSimulationSteps
@@ -33,6 +33,7 @@ struct vstat ; max; min; mean; std ; end
 # Global functions to expose
 # sccreate - Create a state checker call back
 export sccreate
+export scprint
 
 # ntFreqDef:: default frequency (in time steps) for output.
 ntFreqDef=10;
@@ -60,6 +61,9 @@ precDef=15;
              Example:
              julia> using CLIMA.VariableTemplates
              julia> using StaticArrays
+             julia> using CLIMA.MPIStateArryas
+             julia> using MPI
+             julia> MPI.Init()
              julia> T=Float64
              julia> F1=@vars begin; ν∇u::SMatrix{3, 2, T, 6}; κ∇θ::SVector{3, T}; end
              julia> F2=@vars begin; u::SVector{2, T}; θ::SVector{1, T}; end
@@ -213,6 +217,65 @@ function scstats(V,ivar,nprec)
   vals=vstat(phiMin,phiMax,phiMean,phiStd)
 
   return minVstr, maxVstr, aveVstr, stdVstr, vals
+end
+
+function scprint( cb )
+ # Get print format lengths for cols 1 and 2
+ phi=cb.func.curStats_flat;
+ f=1;
+ a1l=maximum( length.(map(i->(phi[i])[f],range(1,length=length(phi)) )) )
+ f=2;
+ a2l=maximum( length.(map(i->(phi[i])[f],range(1,length=length(phi)) )) )
+ fmt1=@sprintf("%%%d.%ds",a1l,a1l)
+ fmt2=@sprintf("%%%d.%ds",a2l,a2l)
+ fmt3=@sprintf("%%28.20e")
+ sp="                               "
+ # println(fmt1)
+ # println(fmt2)
+ # println(fmt3)
+ println("# BEGIN SCPRINT")
+ println("# varr - reference values (from reference run)    ")
+ println("# parr - digits match precision (hand edit as needed) ")
+ println("#")
+ println("# [")
+ println("#  [ MPIStateArray Name, Field Name, Maximum, Minimum, Mean, Standard Deviation ],")
+ println("#  [         :                :          :        :      :          :           ],")
+ println("# ]")
+ println("varr = [")
+ for lv in cb.func.curStats_flat
+  s1=lv[1]
+  l1=length(s1); s1=sp[1:a1l-l1] * "\"" * s1 * "\"";
+  s2=lv[2]
+  if typeof(s2) == String
+    l2=length(s2); s2=sp[1:a2l-l2] * "\"" * s2 * "\"";
+    s22="";
+  end
+  if typeof(s2) == Symbol
+    s22=s2;
+    l2=length(String(s2)); s2=sp[1:a2l-l2+1] * ":";
+  end
+  s3=sprintf1(fmt3,lv[3])
+  s4=sprintf1(fmt3,lv[4])
+  s5=sprintf1(fmt3,lv[5])
+  s6=sprintf1(fmt3,lv[6])
+  println( " [ ", s1,", ", s2,s22,"," ,s3,",", s4,",", s5,",", s6," ]," )
+ end
+ println("]")
+
+ println("parr = [")
+ for lv in cb.func.curStats_flat
+  s1=lv[1]
+  l1=length(s1); s1=sp[1:a1l-l1] * "\"" * s1 * "\"";
+  s2=lv[2]
+  l2=length(s2); s2=sp[1:a2l-l2] * "\"" * s2 * "\"";
+  s3=sprintf1(fmt3,lv[3])
+  s4=sprintf1(fmt3,lv[4])
+  s5=sprintf1(fmt3,lv[5])
+  s6=sprintf1(fmt3,lv[6])
+  println( " [ ", s1,", ", s2,"," ,"    16,    16,    16,    16 ]," )
+ end
+ println("]")
+ println("# END SCPRINT")
 end
 
 end # module
