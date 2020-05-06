@@ -61,7 +61,7 @@ precDef=15;
              Example:
              julia> using CLIMA.VariableTemplates
              julia> using StaticArrays
-             julia> using CLIMA.MPIStateArryas
+             julia> using CLIMA.MPIStateArrays
              julia> using MPI
              julia> MPI.Init()
              julia> T=Float64
@@ -118,6 +118,13 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
   nCbCalls=nCbCalls+1;
   nStep=(nCbCalls-1)*ntFreq+1;
   nSStr=@sprintf("%7.7d",nStep-1)
+
+  ## Free previous curStats_flat if there is one 
+  #  (interesting piece of code - it works, but I am not sure its very elegant!)
+  for i in range(1,length=length(curStats_flat))
+   pop!(curStats_flat)
+  end
+
 
   ## Print header
   nprec=min(max(1,prec),20)
