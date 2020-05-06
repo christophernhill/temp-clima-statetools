@@ -94,6 +94,12 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, ref
     CLIMAStateCheck.StateCheck.scprintref( cb )
     println("# ====================================================================================")
 
+    ## Check results against reference if present
+    if length(refDat) > 0
+     println("Checking results")
+     CLIMAStateCheck.StateCheck.scdocheck( cb, refDat )
+    end
+
     @test true
 end
 
