@@ -90,6 +90,7 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0)
 
     ## Print state statistics in format for use as reference values
     println("# ========== Test number ",nt," reference values and precision match template. =======")
+    println("# ========== $(@__FILE__) test reference values ======================================")
     CLIMAStateCheck.StateCheck.scprintref( cb )
     println("# ====================================================================================")
 
@@ -97,7 +98,10 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0)
 end
 
 @testset "$(@__FILE__)" begin
+
+    include("test_ocean_gyre_refvals.jl")
     nt=1
+    
     boundary_conditions = [
         (
             CLIMA.HydrostaticBoussinesq.CoastlineNoSlip(),
