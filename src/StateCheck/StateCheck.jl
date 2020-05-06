@@ -219,20 +219,32 @@ function scstats(V,ivar,nprec)
   return minVstr, maxVstr, aveVstr, stdVstr, vals
 end
 
-function scprint( cb )
- # Get print format lengths for cols 1 and 2
+"""
+ scprintref :: Print out a "state check" call-back table of values in a format
+               suitable for use as a set of reference numbers for CI comparison.
+
+               Input:
+                cb - callback variable of type CLIMA.GenericCallbacks.Every*
+               Updates:
+                Nothing
+               Returns:
+                Nothing - prints to REPL
+"""
+function scprintref( cb )
+ # Get print format lengths for cols 1 and 2 so they are aligned
+ # for readability.
  phi=cb.func.curStats_flat;
  f=1;
  a1l=maximum( length.(map(i->(phi[i])[f],range(1,length=length(phi)) )) )
  f=2;
  a2l=maximum( length.(String.((map(i->(phi[i])[f],range(1,length=length(phi)) )) ) ) )
- fmt1=@sprintf("%%%d.%ds",a1l,a1l)
- fmt2=@sprintf("%%%d.%ds",a2l,a2l)
- fmt3=@sprintf("%%28.20e")
- sp="                               "
- # println(fmt1)
- # println(fmt2)
- # println(fmt3)
+ fmt1=@sprintf("%%%d.%ds",a1l,a1l) # Column 1
+ fmt2=@sprintf("%%%d.%ds",a2l,a2l) # Column 2
+ fmt3=@sprintf("%%28.20e")         # All numbers at full precision
+ # Create an string of spaces to be used for fomatting
+ sp="                                                                           "
+
+ # Write header
  println("# BEGIN SCPRINT")
  println("# varr - reference values (from reference run)    ")
  println("# parr - digits match precision (hand edit as needed) ")
@@ -241,6 +253,13 @@ function scprint( cb )
  println("#  [ MPIStateArray Name, Field Name, Maximum, Minimum, Mean, Standard Deviation ],")
  println("#  [         :                :          :        :      :          :           ],")
  println("# ]")
+ #
+ # Write tables
+ #  Reference value and precision match tables are separate since it is more
+ #  common to update reference values occiasionally while precision values are
+ #  typically changed rarely and the precision values are hand edited from experience.
+ #
+ # Write table of reference values
  println("varr = [")
  for lv in cb.func.curStats_flat
   s1=lv[1]
@@ -262,6 +281,8 @@ function scprint( cb )
  end
  println("]")
 
+ # Write table of reference match precisions using default precision that
+ # can be hand upadated.
  println("parr = [")
  for lv in cb.func.curStats_flat
   s1=lv[1]
