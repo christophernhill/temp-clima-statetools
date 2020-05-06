@@ -28,7 +28,7 @@ function config_simple_box(FT, N, resolution, dimensions; BC = nothing)
     return config
 end
 
-function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0)
+function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, refDat=() )
     CLIMA.init()
 
     FT = Float64
@@ -101,7 +101,7 @@ end
 
     include("test_ocean_gyre_refvals.jl")
     nt=1
-    
+
     boundary_conditions = [
         (
             CLIMA.HydrostaticBoussinesq.CoastlineNoSlip(),
@@ -116,9 +116,10 @@ end
     ]
 
     for BC in boundary_conditions
-        test_ocean_gyre(imex = false, BC = BC, Δt = 600, nt=nt)
+        test_ocean_gyre(imex = false, BC = BC, Δt = 600, nt=nt, refDat=( refVals[nt], refPrecs[nt] ) )
         nt=nt+1
-        test_ocean_gyre(imex = true, BC = BC, Δt = 150, nt=nt)
+        test_ocean_gyre(imex = true, BC = BC, Δt = 150, nt=nt, refDat=( refVals[nt], refPrecs[nt] ) )
         nt=nt+1
     end
+
 end
