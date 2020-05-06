@@ -28,7 +28,7 @@ function config_simple_box(FT, N, resolution, dimensions; BC = nothing)
     return config
 end
 
-function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60)
+function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0)
     CLIMA.init()
 
     FT = Float64
@@ -77,6 +77,8 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60)
         Courant_number = Courant_number,
     )
 
+    ## Create a callback to report state statistics for main MPIStateArrays
+    ## every ntFreq timesteps.
     ntFreq=30
     # cb=CLIMAStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),(solver_config.dg.auxstate,"aux",), (solver_config.dg.diffstate,"diff",) ], ntFreq; prec=12 )
     cb=CLIMAStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),
@@ -86,10 +88,16 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60)
 
     result = CLIMA.invoke!(solver_config; user_callbacks=[cb] )
 
+    ## Print state statistics in format for use as reference values
+    println("# ========== Test number ",nt," reference values and precision match template. =======")
+    CLIMAStateCheck.StateCheck.scprintref( cb )
+    println("# ====================================================================================")
+
     @test true
 end
 
 @testset "$(@__FILE__)" begin
+    nt=1
     boundary_conditions = [
         (
             CLIMA.HydrostaticBoussinesq.CoastlineNoSlip(),
@@ -104,7 +112,9 @@ end
     ]
 
     for BC in boundary_conditions
-        test_ocean_gyre(imex = false, BC = BC, Δt = 600)
-        test_ocean_gyre(imex = true, BC = BC, Δt = 150)
+        test_ocean_gyre(imex = false, BC = BC, Δt = 600, nt=nt)
+        nt=nt+1
+        test_ocean_gyre(imex = true, BC = BC, Δt = 150, nt=nt)
+        nt=nt+1
     end
 end
