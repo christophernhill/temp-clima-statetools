@@ -37,6 +37,7 @@ export scdocheck
 export scprint
 
 # ntFreqDef:: default frequency (in time steps) for output.
+# precDef  :: default precision used for formatted output table
 ntFreqDef=10;
 precDef=15;
 
@@ -319,11 +320,88 @@ end
 function scdocheck( cb, refDat )
 
   irow=1
+  iVal=1
+  iPrec=2
+  pass=true
   for row in cb.func.curStats_flat
-   println(row)
-   println(refDat[1][irow])
+   ## Debugging
+   # println(row)
+   # println(refDat[iVal][irow])
+   # println(refDat[iPrec][irow])
+
+   ## Make array copy for reporting
+   resDat=copy(refDat[iPrec][irow])
+
+   ## Check MPIStateArrayName
+   cval=row[1]
+   rval=refDat[iVal][irow][1]
+   if cval != rval
+    pass=false
+    resDat[1]="FAIL"
+   else
+    resDat[1]=cval
+   end
+
+   ## Check term name
+   cval=row[2]
+   rval=refDat[iVal][irow][2]
+   if cval != rval
+    pass=false
+    resDat[2]="FAIL"
+   else
+    resDat[2]=cval
+   end
+
+   # Check numeric values
+   nv=3
+   for nv in [3,4,5,6]
+    fmt=@sprintf("%%28.20e")
+    lfld=28;ndig=20;
+    cval=row[nv]
+    cvalc=sprintf1(fmt,cval)
+    rval=refDat[iVal][irow][nv]
+    rvalc=sprintf1(fmt,rval)
+    pcmp=refDat[iPrec][irow][nv]
+     
+    if pcmp > 0
+    
+     ep1=cvalc[lfld-3:lfld]
+     ep2=rvalc[lfld-3:lfld]
+     if ep1 != ep2
+      nmatch=0
+     else
+      dp1=cvalc[2:3+pcmp+1]
+      dp2=rvalc[2:3+pcmp+1]
+      nmatch = 0
+      imatch = 1
+      for c in dp1
+       if c == dp2[imatch]
+        nmatch = imatch
+       else
+        break
+       end
+       imatch = imatch+1
+      end
+     end
+     if nmatch < pcmp
+      pass = false
+      resDat[nv]="N("*string(nmatch)*")*"
+     else
+      resDat[nv]="Y("*string(nmatch)*")"
+     end
+    else
+     resDat[nv]="0"
+    end
+   end
+   
+  
+   #
+   println(resDat)
+   # Next row
    irow=irow+1
   end
+  return pass
+
 end
 
 end # module
