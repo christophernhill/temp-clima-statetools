@@ -1,7 +1,7 @@
 # temp-clima-statechecks
 Temporary place to store state check code for simple regression testing
 
-# Example usage 1
+# Example 1 usage
   - see test/Ocean/HydrostaticBoussinesq/test_ocean_gyre.jl
   ```
   using Pkg
@@ -12,6 +12,89 @@ Temporary place to store state check code for simple regression testing
   using CLIMAStateCheck
   include("/Users/chrishill/projects/github.com/christophernhill/temp-clima-statetools/test/Ocean/HydrostaticBoussinesq/test_ocean_gyre.jl")
   ```
+
+## Example 1 output
+  ```
+  julia> include("/Users/chrishill/projects/github.com/christophernhill/temp-clima-statetools/test/Ocean/HydrostaticBoussinesq/test_ocean_gyre.jl")
+[ Info: Initializing ocean_gyre
+# Start: creating state check callback
+   Creating state check callback labeled "Q" for symbols
+    u
+    η
+    θ
+   Creating state check callback labeled "s_aux" for symbols
+    w
+    pkin
+    wz0
+    y
+   Creating state check callback labeled "s_gflux" for symbols
+    ν∇u
+    κ∇θ
+# Finish: creating state check callback
+┌ Info: Starting ocean_gyre
+│     dt              = 6.00000e+02
+│     timeend         = 36000.00
+│     number of steps = 60
+└     norm(Q)         = 4.1952353926806140e+08
+# SC +++++++++++CLIMA StateCheck call-back start+++++++++++++++++
+# SC  Step  |   Label    |  Field   |                            Stats                       
+# SC =======|============|==========|              min() |              max() |             mean() |              std() |
+# SC 0000000|           Q|     u[1] |  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|
+# SC 0000000|           Q|     u[2] |  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|
+# SC 0000000|           Q|        η |  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|
+# SC 0000000|           Q|        θ | -3.424812630121e-15|  9.000000000000e+00|  2.500000000000e+00|  2.197510940588e+00|
+# SC 0000000|       s_aux|        w |  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|
+# SC 0000000|       s_aux|     pkin |  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|  0.000000000000e+00|
+         :
+         :
+         :
+# SC +++++++++++CLIMA StateCheck call-back start+++++++++++++++++
+# SC  Step  |   Label    |  Field   |                            Stats                       
+# SC =======|============|==========|              min() |              max() |             mean() |              std() |
+# SC 0000240|           Q|     u[1] | -2.457089033404e-01|  2.674849354146e-01|  4.764370551590e-03|  2.037859986937e-02|
+# SC 0000240|           Q|     u[2] | -9.194977106848e-02|  1.400849699594e-01| -2.274546887528e-03|  1.778120297407e-02|
+# SC 0000240|           Q|        η | -6.122282071028e-01|  6.157266391668e-01| -1.869594197193e-03|  2.262271070924e-01|
+# SC 0000240|           Q|        θ |  2.414779334762e-04|  9.105420708228e+00|  2.499499177545e+00|  2.197389325944e+00|
+# SC 0000240|       s_aux|        w | -6.376145955681e-05|  7.147445794344e-05|  7.232051089969e-07|  1.068828471001e-05|
+# SC 0000240|       s_aux|     pkin | -9.008310158775e-01|  0.000000000000e+00| -3.320695175176e-01|  2.562133390453e-01|
+# SC 0000240|       s_aux|      wz0 | -2.396216845973e-05|  1.660904611766e-05| -6.194898440947e-08|  7.953910012995e-06|
+# SC 0000240|       s_aux|        y |  0.000000000000e+00|  4.000000000000e+06|  2.000000000000e+06|  1.180252702815e+06|
+# SC 0000240|     s_gflux|   ν∇u[1] | -1.218321501964e-02|  1.235185356956e-02| -4.559819889545e-08|  3.329642242068e-04|
+# SC 0000240|     s_gflux|   ν∇u[2] | -2.307135030110e-03|  1.353978860143e-02|  5.705380960853e-05|  9.320960867901e-04|
+# SC 0000240|     s_gflux|   ν∇u[3] | -2.404607362423e-05|  2.215881128985e-05|  2.186653515634e-08|  2.371796493099e-06|
+# SC 0000240|     s_gflux|   ν∇u[4] | -5.674037999884e-03|  5.893981832343e-03| -7.824422550395e-06|  4.339853162236e-04|
+# SC 0000240|     s_gflux|   ν∇u[5] | -1.754460953231e-03|  7.786500035802e-03|  1.383797795415e-05|  4.344375825323e-04|
+# SC 0000240|     s_gflux|   ν∇u[6] | -2.282797039587e-05|  1.395576576944e-05|  1.860227008382e-08|  2.142648985120e-06|
+# SC 0000240|     s_gflux|    κ∇θ[1 | -1.424017380421e-04|  7.019346539399e-05|  2.804135908467e-06|  1.020897092691e-05|
+# SC 0000240|     s_gflux|    κ∇θ[2 | -3.077388182672e-03|  1.047618506019e-04| -9.821352442009e-04|  8.311642872123e-04|
+# SC 0000240|     s_gflux|    κ∇θ[3 | -3.446130958128e-05|  1.225490224698e-05|  4.548252528072e-07|  1.667050569465e-06|
+# SC +++++++++++CLIMA StateCheck call-back end+++++++++++++++++++
+
+# SC +++++++++++CLIMA StateCheck ref val check start+++++++++++++++++
+# SC "N( )" bracketing indicates field failed to match      
+# SC "P="  row pass count      
+# SC "F="  row pass count      
+# SC "NA=" row not checked count      
+# SC 
+# SC        Label         Field      min()      max()     mean()      std() 
+# SC            Q,         u[1],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC            Q,         u[2],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC            Q,            η,        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC            Q,            θ,        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC        s_aux,            w,        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC        s_aux,         pkin,        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC        s_aux,          wz0,        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC        s_aux,            y,        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC      s_gflux,       ν∇u[1],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC      s_gflux,       ν∇u[2],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC      s_gflux,       ν∇u[3],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC      s_gflux,       ν∇u[4],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC      s_gflux,       ν∇u[5],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC      s_gflux,       ν∇u[6],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC      s_gflux,       κ∇θ[1],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC      s_gflux,       κ∇θ[2],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC      s_gflux,       κ∇θ[3],        11,        11,        11,         0 :: P=5, F=0, NA=1
+# SC +++++++++++CLIMA StateCheck ref val check end+++++++++++++++++
 
 # Example usage 2
 
