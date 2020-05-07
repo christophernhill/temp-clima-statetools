@@ -95,12 +95,13 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, ref
     println("# ====================================================================================")
 
     ## Check results against reference if present
+    tres=true
     if length(refDat) > 0
      println("Checking results")
-     CLIMAStateCheck.StateCheck.scdocheck( cb, refDat )
+     tres=CLIMAStateCheck.StateCheck.scdocheck( cb, refDat )
     end
 
-    @test true
+    @test tres
 end
 
 @testset "$(@__FILE__)" begin
