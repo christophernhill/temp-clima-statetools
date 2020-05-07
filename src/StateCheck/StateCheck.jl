@@ -316,18 +316,38 @@ function scprintref( cb )
 end
 
 """
+ scdocheck :: Compare a current State check call-back set of values with a 
+              reference set and match precision table pair.
+               
+              Input:  cb - StateCheck call-back variables
+                      refDat - table of reference values and match precisions
+
+              Output: true  - comparison passed
+                      false - comparison failed
 """
 function scdocheck( cb, refDat )
 
+  println("# SC +++++++++++CLIMA StateCheck ref val check start+++++++++++++++++")
+  println("# SC \"N( )\" bracketing indicates field failed to match      ")
+  println("# SC \"P=\"  row pass count      ")
+  println("# SC \"F=\"  row pass count      ")
+  println("# SC \"NA=\" row not checked count      ")
+  println("# SC ")
+  println("# SC        Label         Field      min()      max()     mean()      std() ")
   irow=1
   iVal=1
   iPrec=2
-  pass=true
+  allPass=true
+
   for row in cb.func.curStats_flat
    ## Debugging
    # println(row)
    # println(refDat[iVal][irow])
    # println(refDat[iPrec][irow])
+   rowPass   =true
+   rowColPass=0
+   rowColNA  =0
+   rowColFail=0
 
    ## Make array copy for reporting
    resDat=copy(refDat[iPrec][irow])
@@ -336,20 +356,31 @@ function scdocheck( cb, refDat )
    cval=row[1]
    rval=refDat[iVal][irow][1]
    if cval != rval
-    pass=false
-    resDat[1]="FAIL"
+    allPass=false
+    rowPass=false
+    rowColFail+=1
+    resDat[1]="N"*"("*rval*")"
    else
     resDat[1]=cval
+    rowColPass+=1
+    resDat[1]="N"*"("*rval*")"
    end
 
    ## Check term name
    cval=row[2]
    rval=refDat[iVal][irow][2]
    if cval != rval
-    pass=false
-    resDat[2]="FAIL"
+    allPass=false
+    rowPass=false
+    if typeof(rval) == String
+     resDat[2]="N"*"("*rval*")"
+    else
+     resDat[2]="N"*"("*string(rval)*")"
+    end
+    rowColFail+=1
    else
     resDat[2]=cval
+    rowColPass+=1
    end
 
    # Check numeric values
@@ -362,14 +393,17 @@ function scdocheck( cb, refDat )
     rval=refDat[iVal][irow][nv]
     rvalc=sprintf1(fmt,rval)
     pcmp=refDat[iPrec][irow][nv]
-     
+
+    # Skip if compare digits set to 0
     if pcmp > 0
-    
+   
+     # Check exponent part
      ep1=cvalc[lfld-3:lfld]
      ep2=rvalc[lfld-3:lfld]
      if ep1 != ep2
       nmatch=0
      else
+      # Now check individual digits left to right
       dp1=cvalc[2:3+pcmp+1]
       dp2=rvalc[2:3+pcmp+1]
       nmatch = 0
@@ -384,23 +418,31 @@ function scdocheck( cb, refDat )
       end
      end
      if nmatch < pcmp
-      pass = false
-      resDat[nv]="N("*string(nmatch)*")*"
+      allPass = false
+      rowPass = false
+      resDat[nv]="N("*string(nmatch)*")"
+      rowColFail+=1
      else
-      resDat[nv]="Y("*string(nmatch)*")"
+      resDat[nv]=string(nmatch)
+      rowColPass+=1
      end
     else
      resDat[nv]="0"
+      rowColNA+=1
     end
    end
    
   
    #
-   println(resDat)
+   # println(resDat)
+   @printf("# SC %12.12s, %12.12s, %9.9s, %9.9s, %9.9s, %9.9s", 
+    resDat[1], resDat[2], resDat[3], resDat[4], resDat[5], resDat[6] )
+    @printf(" :: P=%d, F=%d, NA=%d\n",rowColPass,rowColFail,rowColNA)
    # Next row
    irow=irow+1
   end
-  return pass
+  println("# SC +++++++++++CLIMA StateCheck ref val check end+++++++++++++++++")
+  return allPass
 
 end
 
