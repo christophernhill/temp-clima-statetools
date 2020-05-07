@@ -1,7 +1,19 @@
 # temp-clima-statechecks
 Temporary place to store state check code for simple regression testing
 
-# Example usage
+# Example usage 1
+  - see test/Ocean/HydrostaticBoussinesq/test_ocean_gyre.jl
+  ```
+  using Pkg
+  Pkg.activate("/Users/chrishill/projects/github.com/climate-machine/CLIMA")
+  Pkg.instantiate()
+  using CLIMA
+  Pkg.add( PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.5")  )
+  using CLIMAStateCheck
+  include("/Users/chrishill/projects/github.com/christophernhill/temp-clima-statetools/test/Ocean/HydrostaticBoussinesq/test_ocean_gyre.jl")
+  ```
+
+# Example usage 2
 
   - see example/Ocean/SplitExplicit/simple_box_sRate_cnh.jl
     1. add this package
@@ -10,7 +22,7 @@ Temporary place to store state check code for simple regression testing
        :
     ## Add State statistics package
     Pkg.add(
-     PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.3")
+     PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools",rev="0.1.5")
     )
     using CLIMAStateCheck
        :
