@@ -363,7 +363,7 @@ function scdocheck( cb, refDat )
    else
     resDat[1]=cval
     rowColPass+=1
-    resDat[1]="N"*"("*rval*")"
+    resDat[1]=rval
    end
 
    ## Check term name
