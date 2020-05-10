@@ -85,7 +85,9 @@ precDef=15;
 """
 sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef; prec=precDef) = ( 
 
- println("# Start: creating state check callback"); 
+ if MPI.Comm_rank(MPI.COMM_WORLD) == 0
+  println("# Start: creating state check callback"); 
+ end;
 
  ####
  # Print fields that the call back create by this call will query
@@ -101,10 +103,14 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
   else
    for s in slist
     if printHead
-     println("   Creating state check callback labeled \"$lab\" for symbols")
+     if MPI.Comm_rank(MPI.COMM_WORLD) == 0
+      println("   Creating state check callback labeled \"$lab\" for symbols")
+     end;
      printHead=false
     end
-    println("    ",s)
+    if MPI.Comm_rank(MPI.COMM_WORLD) == 0
+     println("    ",s)
+    end;
    end
   end
  end;
@@ -138,14 +144,18 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
 
   ## Print header
   nprec=min(max(1,prec),20)
-  println("# SC +++++++++++CLIMA StateCheck call-back start+++++++++++++++++")
-  println("# SC  Step  |   Label    |  Field   |                            Stats                       ")
+  if MPI.Comm_rank(MPI.COMM_WORLD) == 0
+   println("# SC +++++++++++CLIMA StateCheck call-back start+++++++++++++++++")
+   println("# SC  Step  |   Label    |  Field   |                            Stats                       ")
+  end;
   hVarFmt="%" * sprintf1("%d",nprec+8) * "s"
   minStr=sprintf1(hVarFmt," min() ")
   maxStr=sprintf1(hVarFmt," max() ")
   aveStr=sprintf1(hVarFmt," mean() ")
   stdStr=sprintf1(hVarFmt," std() ")
-  println("# SC =======|============|==========|",minStr,"|",maxStr,"|",aveStr,"|",stdStr,"|")
+  if MPI.Comm_rank(MPI.COMM_WORLD) == 0
+   println("# SC =======|============|==========|",minStr,"|",maxStr,"|",aveStr,"|",stdStr,"|")
+  end;
 
   ## Iterate over the set of MPIStateArrays for this callback
   for f in fields
@@ -166,9 +176,13 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
     for n in flattenednames(fieldtype(V,i),prefix=fieldname(V,i))
      ivar=ivar+1
      nStr=@sprintf("%9.9s",n)
-     print("# SC ",nSStr,"|",olStr,"|", nStr, " |")
+     if MPI.Comm_rank(MPI.COMM_WORLD) == 0
+      print("# SC ",nSStr,"|",olStr,"|", nStr, " |")
+     end;
      statsString=scstats(mArray,ivar,nprec)
-     println(statsString[1],"|",statsString[2],"|",statsString[3],"|",statsString[4],"|")
+     if MPI.Comm_rank(MPI.COMM_WORLD) == 0
+      println(statsString[1],"|",statsString[2],"|",statsString[3],"|",statsString[4],"|")
+     end;
      statsVal_dict[n]=statsString[5];
      append!(curStats_flat, [ 
       [olabel,n,statsString[5].max,statsString[5].min,statsString[5].mean,statsString[5].std] 
@@ -177,10 +191,14 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
    end
    curStats_dict[olabel]=statsVal_dict;
   end
-  println("# SC +++++++++++CLIMA StateCheck call-back end+++++++++++++++++++")
+  if MPI.Comm_rank(MPI.COMM_WORLD) == 0
+   println("# SC +++++++++++CLIMA StateCheck call-back end+++++++++++++++++++")
+  end;
  end ;
 
- println("# Finish: creating state check callback"); 
+ if MPI.Comm_rank(MPI.COMM_WORLD) == 0
+  println("# Finish: creating state check callback"); 
+ end;
 
  return cb;
 )
@@ -200,32 +218,32 @@ function scstats(V,ivar,nprec)
   npr=nprec;fmt=@sprintf("%%%d.%de",npr+8,npr)
 
   # Min
-  phiLoc=minimum(V.data[:,ivar,:])
-  phiMin=MPI.Reduce(phiLoc,MPI.MIN,0,V.mpicomm)
+  phiLoc=minimum(V.realdata[:,ivar,:])
+  phiMin=MPI.Allreduce(phiLoc,MPI.MIN,V.mpicomm)
   phi=phiMin
   # minVstr=@sprintf("%23.15e",phi)
   minVstr=sprintf1(fmt,phi)
 
   # Max
-  phiLoc=maximum(V.data[:,ivar,:])
-  phiMax=MPI.Reduce(phiLoc,MPI.MAX,0,V.mpicomm)
+  phiLoc=maximum(V.realdata[:,ivar,:])
+  phiMax=MPI.Allreduce(phiLoc,MPI.MAX,V.mpicomm)
   phi=phiMax
   # maxVstr=@sprintf("%23.15e",phi)
   maxVstr=sprintf1(fmt,phi)
 
   # Ave
-  phiLoc=mean(V.data[:,ivar,:])
-  phiSum=MPI.Reduce(phiLoc,+,0,V.mpicomm)
+  phiLoc=mean(V.realdata[:,ivar,:])
+  phiSum=MPI.Allreduce(phiLoc,+,V.mpicomm)
   phiMean=phiSum/(nproc*1.)
   phi=phiMean
   # aveVstr=@sprintf("%23.15e",phi)
   aveVstr=sprintf1(fmt,phi)
 
   # Std
-  phiLoc=(V.data[:,ivar,:].-phiMean).^2
+  phiLoc=(V.realdata[:,ivar,:].-phiMean).^2
   nVal=length(phiLoc)*1.
-  phiSum=MPI.Reduce(phiLoc,+,0,V.mpicomm)
-  nValSum=MPI.Reduce(nVal,+,0,V.mpicomm)
+  phiSum=MPI.Allreduce(phiLoc,+,V.mpicomm)
+  nValSum=MPI.Allreduce(nVal,+,V.mpicomm)
   phiStd=(sum(phiSum)/(nValSum-1))^0.5
   phi=phiStd
   # stdVstr=@sprintf("%23.15e",phi)
@@ -248,79 +266,81 @@ end
                 Nothing - prints to REPL
 """
 function scprintref( cb )
- # Get print format lengths for cols 1 and 2 so they are aligned
- # for readability.
- phi=cb.func.curStats_flat;
- f=1;
- a1l=maximum( length.(map(i->(phi[i])[f],range(1,length=length(phi)) )) )
- f=2;
- a2l=maximum( length.(String.((map(i->(phi[i])[f],range(1,length=length(phi)) )) ) ) )
- fmt1=@sprintf("%%%d.%ds",a1l,a1l) # Column 1
- fmt2=@sprintf("%%%d.%ds",a2l,a2l) # Column 2
- fmt3=@sprintf("%%28.20e")         # All numbers at full precision
- # Create an string of spaces to be used for fomatting
- sp="                                                                           "
+ if MPI.Comm_rank( MPI.COMM_WORLD ) == 0
+  # Get print format lengths for cols 1 and 2 so they are aligned
+  # for readability.
+  phi=cb.func.curStats_flat;
+  f=1;
+  a1l=maximum( length.(map(i->(phi[i])[f],range(1,length=length(phi)) )) )
+  f=2;
+  a2l=maximum( length.(String.((map(i->(phi[i])[f],range(1,length=length(phi)) )) ) ) )
+  fmt1=@sprintf("%%%d.%ds",a1l,a1l) # Column 1
+  fmt2=@sprintf("%%%d.%ds",a2l,a2l) # Column 2
+  fmt3=@sprintf("%%28.20e")         # All numbers at full precision
+  # Create an string of spaces to be used for fomatting
+  sp="                                                                           "
 
- # Write header
- println("# BEGIN SCPRINT")
- println("# varr - reference values (from reference run)    ")
- println("# parr - digits match precision (hand edit as needed) ")
- println("#")
- println("# [")
- println("#  [ MPIStateArray Name, Field Name, Maximum, Minimum, Mean, Standard Deviation ],")
- println("#  [         :                :          :        :      :          :           ],")
- println("# ]")
- #
- # Write tables
- #  Reference value and precision match tables are separate since it is more
- #  common to update reference values occiasionally while precision values are
- #  typically changed rarely and the precision values are hand edited from experience.
- #
- # Write table of reference values
- println("varr = [")
- for lv in cb.func.curStats_flat
-  s1=lv[1]
-  l1=length(s1); s1=sp[1:a1l-l1] * "\"" * s1 * "\"";
-  s2=lv[2]
-  if typeof(s2) == String
-    l2=length(s2); s2=sp[1:a2l-l2] * "\"" * s2 * "\"";
-    s22="";
+  # Write header
+  println("# BEGIN SCPRINT")
+  println("# varr - reference values (from reference run)    ")
+  println("# parr - digits match precision (hand edit as needed) ")
+  println("#")
+  println("# [")
+  println("#  [ MPIStateArray Name, Field Name, Maximum, Minimum, Mean, Standard Deviation ],")
+  println("#  [         :                :          :        :      :          :           ],")
+  println("# ]")
+  #
+  # Write tables
+  #  Reference value and precision match tables are separate since it is more
+  #  common to update reference values occiasionally while precision values are
+  #  typically changed rarely and the precision values are hand edited from experience.
+  #
+  # Write table of reference values
+  println("varr = [")
+  for lv in cb.func.curStats_flat
+   s1=lv[1]
+   l1=length(s1); s1=sp[1:a1l-l1] * "\"" * s1 * "\"";
+   s2=lv[2]
+   if typeof(s2) == String
+     l2=length(s2); s2=sp[1:a2l-l2] * "\"" * s2 * "\"";
+     s22="";
+   end
+   if typeof(s2) == Symbol
+     s22=s2;
+     l2=length(String(s2)); s2=sp[1:a2l-l2+1] * ":";
+   end
+   s3=sprintf1(fmt3,lv[3])
+   s4=sprintf1(fmt3,lv[4])
+   s5=sprintf1(fmt3,lv[5])
+   s6=sprintf1(fmt3,lv[6])
+   println( " [ ", s1,", ", s2,s22,"," ,s3,",", s4,",", s5,",", s6," ]," )
   end
-  if typeof(s2) == Symbol
-    s22=s2;
-    l2=length(String(s2)); s2=sp[1:a2l-l2+1] * ":";
-  end
-  s3=sprintf1(fmt3,lv[3])
-  s4=sprintf1(fmt3,lv[4])
-  s5=sprintf1(fmt3,lv[5])
-  s6=sprintf1(fmt3,lv[6])
-  println( " [ ", s1,", ", s2,s22,"," ,s3,",", s4,",", s5,",", s6," ]," )
- end
- println("]")
+  println("]")
 
- # Write table of reference match precisions using default precision that
- # can be hand upadated.
- println("parr = [")
- for lv in cb.func.curStats_flat
-  s1=lv[1]
-  l1=length(s1); s1=sp[1:a1l-l1] * "\"" * s1 * "\"";
-  s2=lv[2]
-  if typeof(s2) == String
-    l2=length(s2); s2=sp[1:a2l-l2] * "\"" * s2 * "\"";
-    s22="";
+  # Write table of reference match precisions using default precision that
+  # can be hand upadated.
+  println("parr = [")
+  for lv in cb.func.curStats_flat
+   s1=lv[1]
+   l1=length(s1); s1=sp[1:a1l-l1] * "\"" * s1 * "\"";
+   s2=lv[2]
+   if typeof(s2) == String
+     l2=length(s2); s2=sp[1:a2l-l2] * "\"" * s2 * "\"";
+     s22="";
+   end
+   if typeof(s2) == Symbol
+     s22=s2;
+     l2=length(String(s2)); s2=sp[1:a2l-l2+1] * ":";
+   end
+   s3=sprintf1(fmt3,lv[3])
+   s4=sprintf1(fmt3,lv[4])
+   s5=sprintf1(fmt3,lv[5])
+   s6=sprintf1(fmt3,lv[6])
+   println( " [ ", s1,", ", s2,s22,"," ,"    16,    16,    16,    16 ]," )
   end
-  if typeof(s2) == Symbol
-    s22=s2;
-    l2=length(String(s2)); s2=sp[1:a2l-l2+1] * ":";
-  end
-  s3=sprintf1(fmt3,lv[3])
-  s4=sprintf1(fmt3,lv[4])
-  s5=sprintf1(fmt3,lv[5])
-  s6=sprintf1(fmt3,lv[6])
-  println( " [ ", s1,", ", s2,s22,"," ,"    16,    16,    16,    16 ]," )
+  println("]")
+  println("# END SCPRINT")
  end
- println("]")
- println("# END SCPRINT")
 end
 
 """
@@ -335,6 +355,9 @@ end
 """
 function scdocheck( cb, refDat )
 
+ if MPI.Comm_rank( MPI.COMM_WORLD ) != 0
+  return true
+ end
   println("# SC +++++++++++CLIMA StateCheck ref val check start+++++++++++++++++")
   println("# SC \"N( )\" bracketing indicates field failed to match      ")
   println("# SC \"P=\"  row pass count      ")
