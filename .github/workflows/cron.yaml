@@ -53,7 +53,7 @@ jobs:
              #
              # Before rename to using ClimateMachine
              git checkout ad9bbf7af6e5f3ea8a46a7bab35f4c2770c420d7
-             /opt/julia-1.4.1/bin/julia <<!
+             cat > test.jl <<!
              using Pkg
              Pkg.activate(".")
              Pkg.instantiate()
@@ -61,3 +61,4 @@ jobs:
              using CLIMAStateCheck
              include("../test/Ocean/HydrostaticBoussinesq/test_ocean_gyre.jl")
              !
+             /opt/julia-1.4.1/bin/julia test.jl
