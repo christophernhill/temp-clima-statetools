@@ -5,6 +5,14 @@
                StateCheck functions iterate over named variables in an MPIStateArray,
                calculate and report their statistics and/or write values for all or
                some subset of points at a fixed frequency.
+
+               Functions:
+               StateCheck.sccreate()   - Create a StateCheck call back variable.
+
+               StateCheck.scdocheck()  - Check Statecheck variable values against reference values.
+
+               StateCheck.scprintref() - Print Statecheck variable in format for creating 
+                                         reference values.
 """
 module StateCheck
 
@@ -34,7 +42,7 @@ struct vstat ; max; min; mean; std ; end
 # sccreate - Create a state checker call back
 export sccreate
 export scdocheck
-export scprint
+export scprintref
 
 # ntFreqDef:: default frequency (in time steps) for output.
 # precDef  :: default precision used for formatted output table
