@@ -55,9 +55,9 @@ jobs:
              git checkout ad9bbf7af6e5f3ea8a46a7bab35f4c2770c420d7
              cat > test.jl <<!
              using Pkg
+             Pkg.add( PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools")  )
              Pkg.activate(".")
              Pkg.instantiate()
-             Pkg.add( PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools")  )
              using CLIMAStateCheck
              include("../test/Ocean/HydrostaticBoussinesq/test_ocean_gyre.jl")
              !
