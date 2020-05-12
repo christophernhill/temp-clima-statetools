@@ -1,8 +1,8 @@
 # # State debug statistics
 #
-# This page shows how to use the ```Statestats``` functions to get basic
+# This page shows how to use the ```StateCheck``` functions to get basic
 # statistics for nodal values of fields held in ClimateMachine ```MPIStateArray```
-# data structures. The ```Statestats``` functions can be used to
+# data structures. The ```StateCheck``` functions can be used to
 #
 # 1. Generate statistics on ```MPIStateArray``` holding the state #    of a ClimateMachine experiment.
 # 
@@ -59,7 +59,7 @@ nothing # hide
 
 # ### Create a call-back
 #
-# Now we can create a ```Statestats``` call-back, _cb_, tied to the ```MPIStateArray```
+# Now we can create a ```StateCheck``` call-back, _cb_, tied to the ```MPIStateArray```
 # variables _Q1_ and _Q2_. Each ```MPIStateArray``` in the array
 # of ```MPIStateArray``` variables tracked is paired with a label
 # to identify it. The call-back is also given a frequency (in time step numbers) and
@@ -85,7 +85,7 @@ cb()
 
 # ### Generate arrays of reference values
 #
-# Statestats functions can generate text that can be used to set the value of stored
+# StateCheck functions can generate text that can be used to set the value of stored
 # arrays that can be used in a reference test for subsequent regression testing. This
 # involves 3 steps.
 #
