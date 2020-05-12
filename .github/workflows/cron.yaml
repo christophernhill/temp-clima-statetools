@@ -52,13 +52,13 @@ jobs:
              # git checkout fb2a63456f32c2d40d194cbdbdbf9afe285ac77d
              #
              # Before rename to using ClimateMachine
-             git checkout ad9bbf7af6e5f3ea8a46a7bab35f4c2770c420d7
+             # git checkout ad9bbf7af6e5f3ea8a46a7bab35f4c2770c420d7
              cat > test.jl <<!
              using Pkg
              Pkg.add( PackageSpec(url="https://github.com/christophernhill/temp-clima-statetools")  )
              Pkg.activate(".")
              Pkg.instantiate()
-             using CLIMAStateCheck
+             using ClimateMachineStateCheck
              include("../test/Ocean/HydrostaticBoussinesq/test_ocean_gyre.jl")
              !
              /opt/julia-1.4.1/bin/julia test.jl
