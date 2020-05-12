@@ -46,7 +46,7 @@ jobs:
        run: |
              pwd
              ls -altr
-             git clone https://github.com/climate-machine/CLIMA
+             # git clone https://github.com/climate-machine/CLIMA
              git clone https://github.com/CLIMA/climatemachine.jl
              ls -altr
              cd climatemachine.jl
