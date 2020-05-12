@@ -1,11 +1,11 @@
 using Test
-using CLIMA
-using CLIMA.GenericCallbacks
-using CLIMA.ODESolvers
-using CLIMA.Mesh.Filters
-using CLIMA.VariableTemplates
-using CLIMA.Mesh.Grids: polynomialorder
-using CLIMA.HydrostaticBoussinesq
+using ClimateMachine
+using ClimateMachine.GenericCallbacks
+using ClimateMachine.ODESolvers
+using ClimateMachine.Mesh.Filters
+using ClimateMachine.VariableTemplates
+using ClimateMachine.Mesh.Grids: polynomialorder
+using ClimateMachine.HydrostaticBoussinesq
 
 using CLIMAParameters
 using CLIMAParameters.Planet: grav
@@ -23,13 +23,13 @@ function config_simple_box(FT, N, resolution, dimensions; BC = nothing)
     cʰ = sqrt(_grav * problem.H) # m/s
     model = HydrostaticBoussinesqModel{FT}(param_set, problem, cʰ = cʰ)
 
-    config = CLIMA.OceanBoxGCMConfiguration("ocean_gyre", N, resolution, model)
+    config = ClimateMachine.OceanBoxGCMConfiguration("ocean_gyre", N, resolution, model)
 
     return config
 end
 
 function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, refDat=() )
-    CLIMA.init()
+    ClimateMachine.init()
 
     FT = Float64
 
@@ -51,11 +51,11 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, ref
     timeend = FT(36000) # s
 
     if imex
-        solver_type = CLIMA.IMEXSolverType(linear_model = LinearHBModel)
+        solver_type = ClimateMachine.IMEXSolverType(linear_model = LinearHBModel)
         Courant_number = 0.1
     else
         solver_type =
-            CLIMA.ExplicitSolverType(solver_method = LSRK144NiegemannDiehlBusch)
+            ClimateMachine.ExplicitSolverType(solver_method = LSRK144NiegemannDiehlBusch)
         Courant_number = 0.4
     end
 
@@ -66,7 +66,7 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, ref
     exp_filter = ExponentialFilter(grid, 1, 8)
     modeldata = (vert_filter = vert_filter, exp_filter = exp_filter)
 
-    solver_config = CLIMA.SolverConfiguration(
+    solver_config = ClimateMachine.SolverConfiguration(
         timestart,
         timeend,
         driver_config,
@@ -87,7 +87,7 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, ref
                                               (solver_config.dg.state_gradient_flux,"s_gflux",) ], 
                                             ntFreq; prec=12 )
 
-    result = CLIMA.invoke!(solver_config; user_callbacks=[cb] )
+    result = ClimateMachine.invoke!(solver_config; user_callbacks=[cb] )
 
     ##
     ## Enable the code block below to print table for use in reference value code
@@ -121,14 +121,14 @@ end
 
     boundary_conditions = [
         (
-            CLIMA.HydrostaticBoussinesq.CoastlineNoSlip(),
-            CLIMA.HydrostaticBoussinesq.OceanFloorNoSlip(),
-            CLIMA.HydrostaticBoussinesq.OceanSurfaceStressForcing(),
+            ClimateMachine.HydrostaticBoussinesq.CoastlineNoSlip(),
+            ClimateMachine.HydrostaticBoussinesq.OceanFloorNoSlip(),
+            ClimateMachine.HydrostaticBoussinesq.OceanSurfaceStressForcing(),
         ),
         (
-            CLIMA.HydrostaticBoussinesq.CoastlineFreeSlip(),
-            CLIMA.HydrostaticBoussinesq.OceanFloorNoSlip(),
-            CLIMA.HydrostaticBoussinesq.OceanSurfaceStressForcing(),
+            ClimateMachine.HydrostaticBoussinesq.CoastlineFreeSlip(),
+            ClimateMachine.HydrostaticBoussinesq.OceanFloorNoSlip(),
+            ClimateMachine.HydrostaticBoussinesq.OceanSurfaceStressForcing(),
         ),
     ]
 
