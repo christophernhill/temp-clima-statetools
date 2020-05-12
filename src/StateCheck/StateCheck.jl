@@ -1,6 +1,6 @@
 """
  StateCheck :: Module with a minimal set of functions for gettings statistics 
-               and basic I/O from CLIMA DG state arrays (MPIStateArray type). 
+               and basic I/O from ClimateMachine DG state arrays (MPIStateArray type). 
                Created for regression testing and code change tracking and debugging.
                StateCheck functions iterate over named variables in an MPIStateArray,
                calculate and report their statistics and/or write values for all or
@@ -20,19 +20,18 @@ module StateCheck
 using Formatting
 using MPI
 using Printf
+using StaticArrays
 using Statistics
 
-# Imports from CLIMA core
-import CLIMA.GenericCallbacks:  EveryXSimulationSteps
-import CLIMA.MPIStateArrays:    MPIStateArray
-import CLIMA.VariableTemplates: flattenednames
+# Imports from ClimateMachine core
+import ClimateMachine.GenericCallbacks:  EveryXSimulationSteps
+import ClimateMachine.MPIStateArrays:    MPIStateArray
+import ClimateMachine.VariableTemplates: flattenednames
 
 ####
 # For testing put a new function signature here!
-# Needs to go in CLIMA/src/Utilities/VariableTemplates/var_names.jl
+# Needs to go in src/Utilities/VariableTemplates/var_names.jl
 # This handles SMatrix case
-using Pkg
-Pkg.add("StaticArrays");using StaticArrays
 flattenednames(::Type{T}; prefix="") where {T<:SArray} = ntuple(i -> "$prefix[$i]", length(T))
 ####
 
@@ -69,16 +68,16 @@ precDef=15;
                 sccb: A state checker that can be used in a callback().
 
              Example:
-             julia> using CLIMA.VariableTemplates
+             julia> using ClimateMachine.VariableTemplates
              julia> using StaticArrays
-             julia> using CLIMA.MPIStateArrays
+             julia> using ClimateMachine.MPIStateArrays
              julia> using MPI
              julia> MPI.Init()
              julia> T=Float64
              julia> F1=@vars begin; ν∇u::SMatrix{3, 2, T, 6}; κ∇θ::SVector{3, T}; end
              julia> F2=@vars begin; u::SVector{2, T}; θ::SVector{1, T}; end
-             julia> Q1=MPIStateArray{Float32,F1}(MPI.COMM_WORLD,CLIMA.array_type(),4,9,8);
-             julia> Q2=MPIStateArray{Float64,F2}(MPI.COMM_WORLD,CLIMA.array_type(),4,6,8);
+             julia> Q1=MPIStateArray{Float32,F1}(MPI.COMM_WORLD,ClimateMachine.array_type(),4,9,8);
+             julia> Q2=MPIStateArray{Float64,F2}(MPI.COMM_WORLD,ClimateMachine.array_type(),4,6,8);
              julia> cb=StateCheck.sccreate([(Q1,"My gradients"),(Q2,"My fields")],1; prec=$precDef);
              julia> cb()
  ========================================================================================
@@ -99,17 +98,17 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
   slist=typeof(Q).parameters[2].names;
   l=length(slist);
   if l == 0
-   println("#  MPIStateArray labeled \"$lab\" has no named symbols.");
+   println("# SC  MPIStateArray labeled \"$lab\" has no named symbols.");
   else
    for s in slist
     if printHead
      if MPI.Comm_rank(MPI.COMM_WORLD) == 0
-      println("   Creating state check callback labeled \"$lab\" for symbols")
+      println("# SC Creating state check callback labeled \"$lab\" for symbols")
      end;
      printHead=false
     end
     if MPI.Comm_rank(MPI.COMM_WORLD) == 0
-     println("    ",s)
+     println("# SC ",s)
     end;
    end
   end
@@ -145,7 +144,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
   ## Print header
   nprec=min(max(1,prec),20)
   if MPI.Comm_rank(MPI.COMM_WORLD) == 0
-   println("# SC +++++++++++CLIMA StateCheck call-back start+++++++++++++++++")
+   println("# SC +++++++++++ClimateMachine StateCheck call-back start+++++++++++++++++")
    println("# SC  Step  |   Label    |  Field   |                            Stats                       ")
   end;
   hVarFmt="%" * sprintf1("%d",nprec+8) * "s"
@@ -192,7 +191,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
    curStats_dict[olabel]=statsVal_dict;
   end
   if MPI.Comm_rank(MPI.COMM_WORLD) == 0
-   println("# SC +++++++++++CLIMA StateCheck call-back end+++++++++++++++++++")
+   println("# SC +++++++++++ClimateMachine StateCheck call-back end+++++++++++++++++++")
   end;
  end ;
 
@@ -259,7 +258,7 @@ end
                suitable for use as a set of reference numbers for CI comparison.
 
                Input:
-                cb - callback variable of type CLIMA.GenericCallbacks.Every*
+                cb - callback variable of type ClimateMachine.GenericCallbacks.Every*
                Updates:
                 Nothing
                Returns:
@@ -358,7 +357,7 @@ function scdocheck( cb, refDat )
  if MPI.Comm_rank( MPI.COMM_WORLD ) != 0
   return true
  end
-  println("# SC +++++++++++CLIMA StateCheck ref val check start+++++++++++++++++")
+  println("# SC +++++++++++ClimateMachine StateCheck ref val check start+++++++++++++++++")
   println("# SC \"N( )\" bracketing indicates field failed to match      ")
   println("# SC \"P=\"  row pass count      ")
   println("# SC \"F=\"  row pass count      ")
@@ -472,7 +471,7 @@ function scdocheck( cb, refDat )
    # Next row
    irow=irow+1
   end
-  println("# SC +++++++++++CLIMA StateCheck ref val check end+++++++++++++++++")
+  println("# SC +++++++++++ClimateMachine StateCheck ref val check end+++++++++++++++++")
   return allPass
 
 end
