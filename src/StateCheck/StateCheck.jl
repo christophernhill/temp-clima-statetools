@@ -85,7 +85,7 @@ precDef=15;
 sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef; prec=precDef) = ( 
 
  if MPI.Comm_rank(MPI.COMM_WORLD) == 0
-  println("# Start: creating state check callback"); 
+  println("# SC Start: creating state check callback"); 
  end;
 
  ####
@@ -196,7 +196,7 @@ sccreate(fields::Array{ <:Tuple{<:MPIStateArray, String} },ntFreq::Int=ntFreqDef
  end ;
 
  if MPI.Comm_rank(MPI.COMM_WORLD) == 0
-  println("# Finish: creating state check callback"); 
+  println("# SC Finish: creating state check callback"); 
  end;
 
  return cb;
