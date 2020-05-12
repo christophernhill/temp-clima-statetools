@@ -81,8 +81,8 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, ref
     ## every ntFreq timesteps.
     ntFreq=30
     # Commented line below is for previous naming rules for DG internal data structures. This can go once all code is up to date
-    # cb=CLIMAStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),(solver_config.dg.auxstate,"aux",), (solver_config.dg.diffstate,"diff",) ], ntFreq; prec=12 )
-    cb=CLIMAStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),
+    # cb=ClimateMachineStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),(solver_config.dg.auxstate,"aux",), (solver_config.dg.diffstate,"diff",) ], ntFreq; prec=12 )
+    cb=ClimateMachineStateCheck.StateCheck.sccreate( [ (solver_config.Q,"Q",),
                                               (solver_config.dg.state_auxiliary,"s_aux",), 
                                               (solver_config.dg.state_gradient_flux,"s_gflux",) ], 
                                             ntFreq; prec=12 )
@@ -99,7 +99,7 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, ref
      ## Print state statistics in format for use as reference values
      println("# SC ========== Test number ",nt," reference values and precision match template. =======")
      println("# SC ========== $(@__FILE__) test reference values ======================================")
-     CLIMAStateCheck.StateCheck.scprintref( cb )
+     ClimateMachineStateCheck.StateCheck.scprintref( cb )
      println("# SC ====================================================================================")
     end
     ##
@@ -108,7 +108,7 @@ function test_ocean_gyre(; imex::Bool = false, BC = nothing, Δt = 60, nt=0, ref
     checkRefValsPass=true
     if length(refDat) > 0
      println("Checking results")
-     checkRefValsPass=CLIMAStateCheck.StateCheck.scdocheck( cb, refDat )
+     checkRefValsPass=ClimateMachineStateCheck.StateCheck.scdocheck( cb, refDat )
     end
 
     @test checkRefValsPass
