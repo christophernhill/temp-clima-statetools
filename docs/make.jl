@@ -1,4 +1,12 @@
 push!(LOAD_PATH,"../src/")
+using Pkg
+Pkg.add( PackageSpec(url="../../climatemachine.jl") )
+Pkg.add("MPI")
+Pkg.add("StaticArrays")
+
+Pkg.add("Documenter")
+Pkg.add("Literate")
+
 using
  Documenter,
  Literate
