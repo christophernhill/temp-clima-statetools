@@ -12,6 +12,11 @@ pool:
 steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
+- bash:
+   pwd
+   cat /proc/cpuinfo
+   cat /ptoc/meminfo
+   hostname
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.
