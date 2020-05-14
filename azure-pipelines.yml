@@ -15,7 +15,7 @@ steps:
 - bash: |
    pwd
    cat /proc/cpuinfo
-   cat /ptoc/meminfo
+   cat /proc/meminfo
    hostname
 
 - script: |
