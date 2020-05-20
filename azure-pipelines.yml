@@ -3,24 +3,21 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- master
 
-pool:
-  vmImage: 'ubuntu-latest'
-
-environment: Big VM
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-- bash: |
-   pwd
-   cat /proc/cpuinfo
-   cat /proc/meminfo
-   hostname
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  jobs:
+  - deployment: DeployWeb
+    displayName: deploy Web App
+    pool:
+      vmImage: 'Ubuntu-latest'
+    # creates an environment if it doesn't exist
+    environment: Big VM
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo Hello world
+          - bash: |
+             pwd
+             cat /proc/cpuinfo
+             cat /proc/meminfo
+             hostname
