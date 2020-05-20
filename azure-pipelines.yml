@@ -9,7 +9,7 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-environment: 'Big VM'
+environment: Big VM
 
 steps:
 - script: echo Hello, world!
