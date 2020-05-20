@@ -21,3 +21,4 @@
              cat /proc/cpuinfo
              cat /proc/meminfo
              hostname
+             sleep 3600
